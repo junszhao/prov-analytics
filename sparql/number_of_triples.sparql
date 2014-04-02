@@ -1,0 +1,4 @@
+### This often cannot be executed due to the size of the data 
+
+select count (distinct *)
+where {?s ?p ?o}

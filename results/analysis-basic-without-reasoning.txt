@@ -1,0 +1,46 @@
+==== Analyse ta-provenance====
+6
+http://www.w3.org/ns/prov#Entity	340
+http://www.w3.org/ns/prov#Generation	9102
+http://www.w3.org/ns/prov#Collection	3471
+http://www.w3.org/ns/prov#EmptyCollection	151
+http://www.w3.org/ns/prov#Usage	14797
+http://www.w3.org/ns/prov#Association	7635
+16
+http://www.w3.org/ns/prov#activity	9102
+http://www.w3.org/ns/prov#agent	7635
+http://www.w3.org/ns/prov#entity	14797
+http://www.w3.org/ns/prov#hadRole	23899
+http://www.w3.org/ns/prov#endedAtTime	7635
+http://www.w3.org/ns/prov#wasDerivedFrom	217
+http://www.w3.org/ns/prov#qualifiedUsage	14797
+http://www.w3.org/ns/prov#qualifiedAssociation	7635
+http://www.w3.org/ns/prov#wasAssociatedWith	192
+http://www.w3.org/ns/prov#startedAtTime	7635
+http://www.w3.org/ns/prov#hadPlan	7635
+http://www.w3.org/ns/prov#qualifiedGeneration	9102
+http://www.w3.org/ns/prov#hadMember	50626
+http://www.w3.org/ns/prov#wasInformedBy	96
+http://www.w3.org/ns/prov#wasGeneratedBy	9198
+http://www.w3.org/ns/prov#used	14784
+==== Analyse csiro====
+2
+http://www.w3.org/ns/prov#Person	2
+http://www.w3.org/ns/prov#Organization	3
+9
+http://www.w3.org/ns/prov#wasAssociatedWith	279
+http://www.w3.org/ns/prov#actedOnBehalfOf	2
+http://www.w3.org/ns/prov#wasAttributedTo	31267
+http://www.w3.org/ns/prov#generatedAtTime	31267
+http://www.w3.org/ns/prov#wasDerivedFrom	80907
+http://www.w3.org/ns/prov#wasInformedBy	186
+http://www.w3.org/ns/prov#wasGeneratedBy	22785
+http://www.w3.org/ns/prov#used	51120
+http://www.w3.org/ns/prov#atLocation	22
+==== Analyse obiama====
+0
+No PROV-O instances found
+3
+http://www.w3.org/ns/prov#wasAssociatedWith	203970
+http://www.w3.org/ns/prov#wasGeneratedBy	130139
+http://www.w3.org/ns/prov#used	66397

@@ -1,0 +1,4 @@
+select count(distinct ?p)
+where {?s ?p ?o .
+filter (REGEX(STR(?p), "^http://www.w3.org/ns/prov#"))
+}

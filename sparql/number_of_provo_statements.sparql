@@ -1,0 +1,5 @@
+select ?p count(*)
+where {?s ?p ?o .
+filter (REGEX(STR(?p), "^http://www.w3.org/ns/prov#"))
+}
+group by ?p
