@@ -4,4 +4,10 @@ This is the source code for analysing some of the sample PROV-O data that are pa
 
 This is still work ongoing.
 
-Currently, to test the code, please run python src/analysis/prov-analysis.py
+1. To run simple analysis, 
+
+python src/analysis/prov-analysis.py
+
+2. To run simple provenance rewrite for qualification patterns
+
+python src/rewrite/ProvRewrite.py
