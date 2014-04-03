@@ -23,6 +23,62 @@ except ImportError:
     import json
 
 
+simpleAssociationQuery = """
+    PREFIX prov: <http://www.w3.org/ns/prov#>
+    select distinct ?activity ?agent
+    where {?activity prov:wasAssociatedWith ?agent}
+    """
+
+qualifiedAssociationquery = """
+    PREFIX prov: <http://www.w3.org/ns/prov#>
+    select distinct ?activity ?agent
+    where {?activity prov:qualifiedAssociation [prov:agent ?agent]}
+    """
+
+
+
+
+simpleUsageQuery = """
+    PREFIX prov: <http://www.w3.org/ns/prov#>
+    select distinct ?activity ?entity
+    where {?activity prov:used ?entity}
+    """
+
+qualifiedUsagequery = """
+    PREFIX prov: <http://www.w3.org/ns/prov#>
+    select distinct ?activity ?entity
+    where {?activity prov:qualifiedUsage [prov:entity ?entity]}
+    """
+
+
+
+
+simpleDerivationQuery = """
+    PREFIX prov: <http://www.w3.org/ns/prov#>
+    select distinct ?entity1 ?entity2
+    where {?entity1 prov:wasDerivedFrom ?entity2}
+    """
+
+qualifiedDerivationQuery = """
+    PREFIX prov: <http://www.w3.org/ns/prov#>
+    select distinct ?entity1 ?entity2
+    where {?entity1 prov:qualifiedDerivation [prov:entity ?entity2]}
+    """
+
+
+simpleGenerationQuery = """
+        PREFIX prov: <http://www.w3.org/ns/prov#>
+        select distinct ?entity ?activity
+        where {?entity prov:wasGeneratedBy ?activity}
+        """
+    
+qualifiedGenerationQuery = """
+        PREFIX prov: <http://www.w3.org/ns/prov#>
+        select distinct ?entity ?activity
+        where {?entity prov:qualifiedGeneration [prov:activity ?activity]}
+"""
+
+
 class ProvRewrite(object):
 
     def sparql(self,path, query):
@@ -45,102 +101,85 @@ class ProvRewrite(object):
             return resultSet
 
 
-    def simpleAssociation(self,g):
-        query = """
-            PREFIX prov: <http://www.w3.org/ns/prov#>
-            select distinct ?activity ?agent
-            where {?activity prov:wasAssociatedWith ?agent}
-            """
+    def query(self,g, query):
         data = self.sparql("/sparql/endpoint-lax/"+g, query)
         
-        associations = {}
-
-        for binding in data["results"]["bindings"]:
-
-            activity = binding["activity"]["value"]
-            agent = binding["agent"]["value"]
-            associations[activity]=agent
-        
-        print len(associations)
-        return associations
-
-
-
-
-    def qualifiedAssociation(self,g):
-        query = """
-            PREFIX prov: <http://www.w3.org/ns/prov#>
-            select distinct ?activity ?agent
-            where {?activity prov:qualifiedAssociation [prov:agent ?agent]}
-            """
-        data = self.sparql("/sparql/endpoint-lax/"+g, query)
-        
-        associations = {}
-        
-        for binding in data["results"]["bindings"]:
-            
-            activity = binding["activity"]["value"]
-            agent = binding["agent"]["value"]
-            associations[activity]=agent
-        
-        print len(associations)
-        return associations
-            
-            
-            
-
-    def compare(self, simple, newTriples):
-        
-        newEntityKeys = newTriples.keys()
-        
-        newAssociations = {}
-
-        for key in newEntityKeys:
-            
-            newTriple = newTriples[key]
-            
-            if simple.has_key(key):
-            
-                if (simple[key]!=newTriple):
-                    newAssociations[key]= newTriple
-
-            else:
-                newAssociations[key]= newTriple
-        return newAssociations
-
+        return data
 
 
     def rewriteQualifiedAssociation(self,g):
+        outfilename = g+'newAssociations.nt'
+        outfile = codecs.open(outfilename, mode='w', encoding='UTF-8')
         
-        self.compare(self.simpleAssociation(g), self.qualifiedAssociation(g))
+        newTriples = self.query(g, qualifiedAssociationquery)
         
-#        associations = self.simpleAssociation(g)
-#        
-#        newAssociations ={}
-#        
-#        query = """
-#            PREFIX prov: <http://www.w3.org/ns/prov#>
-#            select distinct ?activity ?agent
-#            where {?activity prov:qualifiedAssociation [prov:agent ?agent]}
-#            """
-#        data = self.sparql("/sparql/endpoint-lax/"+g, query)
-#        
-#        for binding in data["results"]["bindings"]:
-#
-#            activity = binding["activity"]["value"]
-#            agent = binding["agent"]["value"]
-#            
-#            if associations.has_key(activity):
-#            
-#                if (associations[activity]!=agent):
-#                    newAssociations[activity]= agent
-#                    print "<"+activity + ">\t<http://www.w3.org/ns/prov#wasAssociatedWith>\t<" + agent + ">"
-#            else:
-#                newAssociations[activity]= agent
-#                print "<"+activity + ">\t<http://www.w3.org/ns/prov#wasAssociatedWith>\t<" + agent + ">"
-#
-#        print str(len(newAssociations)) + " new association relationships added"
+        triples = 0
+        
+        
+        for binding in newTriples["results"]["bindings"]:
+            
+            activity = binding["activity"]["value"]
+            agent = binding["agent"]["value"]
+            triple = "<" + activity + "> \t <http://www.w3.org/ns/prov#wasAssociatedWith> \t" + "<" + agent + "> .\n"
+            triples = triples +1
+            outfile.write(triple)
+            outfile.flush()
+        
+        outfile.close()
+        
+        print str(triples) + " new associations are added"
+        
+        return
 
+
+    def rewriteQualifiedUsage(self,g):
+        outfilename = g+'newUsage.nt'
+        outfile = codecs.open(outfilename, mode='w', encoding='UTF-8')
+        
+        newTriples = self.query(g, qualifiedUsagequery)
+
+        triples = 0
+        
+        for binding in newTriples["results"]["bindings"]:
+            
+            activity = binding["activity"]["value"]
+            entity = binding["entity"]["value"]
+        
+            triple = "<" + activity + "> \t <http://www.w3.org/ns/prov#used> \t" + "<" + entity + "> .\n"
+            triples = triples +1
+            outfile.write(triple)
+            outfile.flush()
+    
+        print str(triples) + " new usage are added"
+        
+        outfile.close()
+        
+        return
+
+
+    def rewriteQualifiedGeneration(self,g):
+        outfilename = g+'newGeneration.nt'
+        outfile = codecs.open(outfilename, mode='w', encoding='UTF-8')
+        
+        newTriples = self.query(g, qualifiedGenerationQuery)
+        
+        triples = 0
+        
+        
+        for binding in newTriples["results"]["bindings"]:
+            
+            entity = binding["entity"]["value"]
+            activity = binding["activity"]["value"]
+        
+            triple = "<" + entity + "> \t <http://www.w3.org/ns/prov#wasGeneratedBy> \t" + "<" + activity + "> .\n"
+            triples = triples +1
+            outfile.write(triple)
+            outfile.flush()
+        
+        outfile.close()
+        
+        print str(triples) + " new generations are added"
+        
         return
 
 
@@ -148,13 +187,16 @@ class ProvRewrite(object):
         
         print "==== Rewrite " + filename + "===="
         
-    #    rewriteQualifiedGeneration(filename)
+        self.rewriteQualifiedGeneration(filename)
     #    
-    #    rewriteQualifiedDerivation(filename)
+    #    self.rewriteQualifiedDerivation(filename)
     #    
-    #    rewriteQualifiedUsage(filename)
-    #    
+        self.rewriteQualifiedUsage(filename)
+    #
+        
         self.rewriteQualifiedAssociation(filename)
+        
+        
         
         return
 
@@ -168,7 +210,7 @@ class ProvRewrite(object):
         return
 
     def __init__(self):
-        self.endpointpath = ["ta-provenance"]
+        self.endpointpath = ["ta-provenance", "csiro", "obiama"]
         self.endpointhost = "http://www.open-biomed.org.uk/sparql/endpoint-lax/"
 
 if __name__ == "__main__":
