@@ -65,12 +65,9 @@ class ProvRewrite(object):
         return associations
 
 
-    def rewriteQualifiedAssociation(self,g):
-        
-        associations = self.simpleAssociation(g)
-        
-        newAssociations ={}
-        
+
+
+    def qualifiedAssociation(self,g):
         query = """
             PREFIX prov: <http://www.w3.org/ns/prov#>
             select distinct ?activity ?agent
@@ -78,21 +75,71 @@ class ProvRewrite(object):
             """
         data = self.sparql("/sparql/endpoint-lax/"+g, query)
         
+        associations = {}
+        
         for binding in data["results"]["bindings"]:
-
+            
             activity = binding["activity"]["value"]
             agent = binding["agent"]["value"]
+            associations[activity]=agent
+        
+        print len(associations)
+        return associations
             
-            if associations.has_key(activity):
             
-                if (associations[activity]!=agent):
-                    newAssociations[activity]= agent
-                    print "<"+activity + ">\t<http://www.w3.org/ns/prov#wasAssociatedWith>\t<" + agent + ">"
-            else:
-                newAssociations[activity]= agent
-                print "<"+activity + ">\t<http://www.w3.org/ns/prov#wasAssociatedWith>\t<" + agent + ">"
+            
 
-        print str(len(newAssociations)) + " new association relationships added"
+    def compare(self, simple, newTriples):
+        
+        newEntityKeys = newTriples.keys()
+        
+        newAssociations = {}
+
+        for key in newEntityKeys:
+            
+            newTriple = newTriples[key]
+            
+            if simple.has_key(key):
+            
+                if (simple[key]!=newTriple):
+                    newAssociations[key]= newTriple
+
+            else:
+                newAssociations[key]= newTriple
+        return newAssociations
+
+
+
+    def rewriteQualifiedAssociation(self,g):
+        
+        self.compare(self.simpleAssociation(g), self.qualifiedAssociation(g))
+        
+#        associations = self.simpleAssociation(g)
+#        
+#        newAssociations ={}
+#        
+#        query = """
+#            PREFIX prov: <http://www.w3.org/ns/prov#>
+#            select distinct ?activity ?agent
+#            where {?activity prov:qualifiedAssociation [prov:agent ?agent]}
+#            """
+#        data = self.sparql("/sparql/endpoint-lax/"+g, query)
+#        
+#        for binding in data["results"]["bindings"]:
+#
+#            activity = binding["activity"]["value"]
+#            agent = binding["agent"]["value"]
+#            
+#            if associations.has_key(activity):
+#            
+#                if (associations[activity]!=agent):
+#                    newAssociations[activity]= agent
+#                    print "<"+activity + ">\t<http://www.w3.org/ns/prov#wasAssociatedWith>\t<" + agent + ">"
+#            else:
+#                newAssociations[activity]= agent
+#                print "<"+activity + ">\t<http://www.w3.org/ns/prov#wasAssociatedWith>\t<" + agent + ">"
+#
+#        print str(len(newAssociations)) + " new association relationships added"
 
         return
 

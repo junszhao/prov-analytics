@@ -42,11 +42,23 @@ class TestProvRewrite(unittest.TestCase):
 
     def testDetectDuplicateAssociations(self):
         
-        associations = {'file:///mnt/open-biomed-data/oxford/workspace/wf4ever/provenance-corpus/Taverna_repository/workflow_1052_version_1/run_1/workflowrun.prov.ttl#taverna-prov-export','file:///mnt/open-biomed-data/oxford/workspace/wf4ever/provenance-corpus/Taverna_repository/workflow_1052_version_1/run_1/workflowrun.prov.ttl#taverna-engine'}
+        associations = {'file:///mnt/open-biomed-data/oxford/workspace/wf4ever/provenance-corpus/Taverna_repository/workflow_1052_version_1/run_1/workflowrun.prov.ttl#taverna-prov-export':'file:///mnt/open-biomed-data/oxford/workspace/wf4ever/provenance-corpus/Taverna_repository/workflow_1052_version_1/run_1/workflowrun.prov.ttl#taverna-engine'}
         
-        data = ProvRewrite().simpleAssociation("ta-provenance")
-        return self.assertBindingEqual(data, 192, "Wrong.")
+        qualifed = ProvRewrite().qualifiedAssociation("ta-provenance")
+        data = ProvRewrite().compare(qualifed, associations)
+        
+        return self.assertEqual(len(data), 0, "This triple should not be added.")
     
+    def testDetectNewAssociations(self):
+    
+        associations = {'http://ns.taverna.org.uk/2011/run/9a816c93-fe28-41b7-b352-6a3de3a98588/process/3aae8073-f726-480d-8ad1-8e2f446952b1/':'file:///mnt/open-biomed-data/oxford/workspace/wf4ever/provenance-corpus/Taverna_repository/workflow_1833_version_1/run_1/workflowrun.prov.ttl#taverna-engine'}
+        
+        simple = ProvRewrite().simpleAssociation("ta-provenance")
+        data = ProvRewrite().compare(simple, associations)
+        
+        print data
+    
+        return self.assertEqual(len(data), 1, "This triple should be added.")
 
 
 if __name__ == "__main__":
