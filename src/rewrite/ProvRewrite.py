@@ -25,13 +25,13 @@ except ImportError:
 
 simpleAssociationQuery = """
     PREFIX prov: <http://www.w3.org/ns/prov#>
-    select distinct ?activity ?agent
+    select distinct *
     where {?activity prov:wasAssociatedWith ?agent}
     """
 
 qualifiedAssociationquery = """
     PREFIX prov: <http://www.w3.org/ns/prov#>
-    select distinct ?activity ?agent
+    select distinct *
     where {?activity prov:qualifiedAssociation [prov:agent ?agent]}
     """
 
@@ -40,13 +40,13 @@ qualifiedAssociationquery = """
 
 simpleUsageQuery = """
     PREFIX prov: <http://www.w3.org/ns/prov#>
-    select distinct ?activity ?entity
+    select distinct *
     where {?activity prov:used ?entity}
     """
 
 qualifiedUsagequery = """
     PREFIX prov: <http://www.w3.org/ns/prov#>
-    select distinct ?activity ?entity
+    select distinct *
     where {?activity prov:qualifiedUsage [prov:entity ?entity]}
     """
 
@@ -55,26 +55,26 @@ qualifiedUsagequery = """
 
 simpleDerivationQuery = """
     PREFIX prov: <http://www.w3.org/ns/prov#>
-    select distinct ?entity1 ?entity2
+    select distinct *
     where {?entity1 prov:wasDerivedFrom ?entity2}
     """
 
 qualifiedDerivationQuery = """
     PREFIX prov: <http://www.w3.org/ns/prov#>
-    select distinct ?entity1 ?entity2
+    select distinct *
     where {?entity1 prov:qualifiedDerivation [prov:entity ?entity2]}
     """
 
 
 simpleGenerationQuery = """
         PREFIX prov: <http://www.w3.org/ns/prov#>
-        select distinct ?entity ?activity
+        select distinct *
         where {?entity prov:wasGeneratedBy ?activity}
         """
     
 qualifiedGenerationQuery = """
         PREFIX prov: <http://www.w3.org/ns/prov#>
-        select distinct ?entity ?activity
+        select distinct *
         where {?entity prov:qualifiedGeneration [prov:activity ?activity]}
 """
 
@@ -137,6 +137,8 @@ class ProvRewrite(object):
         outfile = codecs.open(outfilename, mode='w', encoding='UTF-8')
         
         newTriples = self.query(g, qualifiedUsagequery)
+        
+        print len(newTriples["results"]["bindings"])
 
         triples = 0
         
@@ -210,7 +212,7 @@ class ProvRewrite(object):
         return
 
     def __init__(self):
-        self.endpointpath = ["ta-provenance", "csiro", "obiama"]
+        self.endpointpath = ["ta-provenance"]
         self.endpointhost = "http://www.open-biomed.org.uk/sparql/endpoint-lax/"
 
 if __name__ == "__main__":
